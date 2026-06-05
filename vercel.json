@@ -1,5 +1,0 @@
-{
-  "framework": "nextjs",
-  "buildCommand": "cd kcap-web && npm install && npm run build",
-  "outputDirectory": "kcap-web/.next"
-}
