@@ -7,24 +7,25 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { useState } from "react"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [name, setName] = useState("")
   const [college, setCollege] = useState("")
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
+  const router = useRouter()
 
   const handleEmailRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     
-    // We register the user. Supabase OTP doesn't easily store metadata in the initial magic link 
-    // unless we use standard password signup. For OTP, we can redirect them to a /setup page.
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signUp({
       email,
+      password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=/setup`,
         data: {
           full_name: name,
           college: college,
@@ -35,7 +36,8 @@ export default function RegisterPage() {
     if (error) {
       toast.error(error.message)
     } else {
-      toast.success("Check your email to verify your account!")
+      toast.success("Account created successfully! Check your email to verify.")
+      router.push("/login")
     }
     setLoading(false)
   }
@@ -44,7 +46,7 @@ export default function RegisterPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/setup`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
       },
     })
     
@@ -58,7 +60,7 @@ export default function RegisterPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>Enter your details below or use Google.</CardDescription>
+          <CardDescription>Enter your details below to register.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <form onSubmit={handleEmailRegister} className="grid gap-4">
@@ -92,8 +94,19 @@ export default function RegisterPage() {
                 required 
               />
             </div>
+            <div className="grid gap-2">
+              <Input 
+                id="password" 
+                type="password" 
+                placeholder="Password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+                minLength={6}
+              />
+            </div>
             <Button className="w-full" type="submit" disabled={loading}>
-              {loading ? "Sending link..." : "Create Account"}
+              {loading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
           

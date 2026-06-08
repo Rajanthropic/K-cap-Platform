@@ -7,27 +7,29 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { useState } from "react"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
+  const router = useRouter()
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+      password,
     })
 
     if (error) {
       toast.error(error.message)
     } else {
-      toast.success("Check your email for the login link!")
+      toast.success("Logged in successfully!")
+      router.push("/dashboard")
     }
     setLoading(false)
   }
@@ -50,7 +52,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Login to KCAP</CardTitle>
-          <CardDescription>Enter your email below or use Google.</CardDescription>
+          <CardDescription>Enter your email and password to log in.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <form onSubmit={handleEmailLogin} className="grid gap-4">
@@ -64,8 +66,18 @@ export default function LoginPage() {
                 required 
               />
             </div>
+            <div className="grid gap-2">
+              <Input 
+                id="password" 
+                type="password" 
+                placeholder="Password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
+            </div>
             <Button className="w-full" type="submit" disabled={loading}>
-              {loading ? "Sending OTP..." : "Send OTP"}
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
           
