@@ -1,13 +1,26 @@
 "use client";
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, Compass, Trophy, ShoppingBag, User, Bell } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Home, Compass, Trophy, ShoppingBag, User, Bell, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { toast } from 'sonner';
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [hasUnread, setHasUnread] = useState(true);
+  const supabase = createClient();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(error.message);
+    } else {
+      router.push('/login');
+    }
+  };
 
   // If we are currently on the notifications page, hide the dot
   // but we also keep state so if they navigate away, it stays hidden
@@ -18,7 +31,7 @@ export function Sidebar() {
       <div className="flex h-14 items-center border-b px-4 font-bold text-lg tracking-tight">
         KCAP
       </div>
-      <nav className="flex-1 space-y-1 p-4">
+      <nav className="flex-1 space-y-1 p-4 overflow-y-auto">
         <Link href="/dashboard" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground">
           <Home className="h-4 w-4" /> Dashboard
         </Link>
@@ -49,6 +62,14 @@ export function Sidebar() {
           <User className="h-4 w-4" /> Profile
         </Link>
       </nav>
+      <div className="p-4 border-t">
+        <button 
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-red-500 hover:bg-red-500/10 transition-colors"
+        >
+          <LogOut className="h-4 w-4" /> Logout
+        </button>
+      </div>
     </div>
   );
 }

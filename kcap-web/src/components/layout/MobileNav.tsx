@@ -1,14 +1,27 @@
 "use client";
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, Compass, Trophy, ShoppingBag, User, Bell } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Home, Compass, Trophy, ShoppingBag, User, Bell, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { toast } from 'sonner';
 
 export function MobileNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const [hasUnread, setHasUnread] = useState(true);
   const showDot = hasUnread && pathname !== '/notifications';
+  const supabase = createClient();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(error.message);
+    } else {
+      router.push('/login');
+    }
+  };
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-background border-t flex items-center justify-around z-50 px-2 pb-safe">
@@ -41,10 +54,10 @@ export function MobileNav() {
         </div>
         <span className="text-[10px]">Alerts</span>
       </Link>
-      <Link href="/u/me" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${pathname === '/u/me' ? 'text-primary' : 'text-muted-foreground'}`}>
-        <User className="h-5 w-5" />
-        <span className="text-[10px]">Profile</span>
-      </Link>
+      <button onClick={handleLogout} className="flex flex-col items-center justify-center w-full h-full space-y-1 text-muted-foreground hover:text-red-500 transition-colors">
+        <LogOut className="h-5 w-5" />
+        <span className="text-[10px]">Logout</span>
+      </button>
     </div>
   );
 }
