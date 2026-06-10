@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import {
   DropdownMenu,
@@ -50,10 +50,8 @@ export function ExportCSVButton() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <Download className="h-4 w-4" /> Export CSV
-        </Button>
+      <DropdownMenuTrigger className={buttonVariants({ variant: "outline", className: "gap-2" })}>
+        <Download className="h-4 w-4" /> Export CSV
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => handleExport()}>
