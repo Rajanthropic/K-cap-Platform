@@ -108,7 +108,7 @@ export default function SetupPage() {
       toast.error(error.message)
     } else {
       toast.success("Profile saved successfully!")
-      router.push("/dashboard")
+      window.location.href = "/u/me"
     }
     setLoading(false)
   }
