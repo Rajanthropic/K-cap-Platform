@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Camera } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -18,11 +18,13 @@ export default function SetupPage() {
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [formData, setFormData] = useState({
     username: "",
     phone: "",
     college: "",
+    batch: "",
     bio: "",
     hobbies: "",
     instagram_handle: "",
@@ -31,6 +33,8 @@ export default function SetupPage() {
     youtube_channel: "",
     github_url: "", // using twitter_handle or adding a column if needed
   })
+
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
 
   useEffect(() => {
     async function checkUser() {
@@ -64,6 +68,19 @@ export default function SetupPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target
     setFormData(prev => ({ ...prev, [id]: value }))
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("File size must be less than 5MB");
+        return;
+      }
+      const imageUrl = URL.createObjectURL(file);
+      setAvatarPreview(imageUrl);
+      // Here you would typically also upload it to Supabase Storage and get the public URL to save to the user's profile
+    }
   }
 
   const handleSubmit = async () => {
@@ -114,10 +131,26 @@ export default function SetupPage() {
           <div className="space-y-3">
             <Label className="text-base">Profile Picture</Label>
             <div className="flex items-center gap-6">
-              <div className="h-24 w-24 rounded-full bg-accent flex flex-col items-center justify-center text-muted-foreground font-bold border-2 border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer relative overflow-hidden group">
-                <Camera className="h-8 w-8 mb-1 group-hover:scale-110 transition-transform text-primary/60" />
-                <span className="text-xs">Upload</span>
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="h-24 w-24 rounded-full bg-accent flex flex-col items-center justify-center text-muted-foreground font-bold border-2 border-dashed border-primary/30 hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer relative overflow-hidden group"
+              >
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
+                ) : (
+                  <>
+                    <Camera className="h-8 w-8 mb-1 group-hover:scale-110 transition-transform text-primary/60" />
+                    <span className="text-xs">Upload</span>
+                  </>
+                )}
               </div>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileChange} 
+                accept="image/*" 
+                className="hidden" 
+              />
               <p className="text-sm text-muted-foreground max-w-sm">Choose a cool avatar or a picture of yourself. (Max size 5MB)</p>
             </div>
           </div>
@@ -140,8 +173,8 @@ export default function SetupPage() {
               </div>
               <div className="space-y-2">
                 <Label>Batch Number</Label>
-                <Input type="text" placeholder="Pending Assignment" disabled value="Pending Assignment" className="bg-muted" />
-                <p className="text-[10px] text-muted-foreground">Assigned by Management</p>
+                <Input id="batch" type="text" placeholder="e.g. Batch 15" value={formData.batch} onChange={handleChange} />
+                <p className="text-[10px] text-muted-foreground">Optional identifier if applicable</p>
               </div>
             </div>
           </div>
