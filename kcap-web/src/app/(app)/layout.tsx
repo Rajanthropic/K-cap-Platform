@@ -1,12 +1,24 @@
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { ModeToggle } from "@/components/theme-toggle";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
-export default function AppLayout({
+export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    const { data: profile } = await supabase.from('users').select('college').eq('id', user.id).single();
+    if (!profile?.college) {
+      redirect('/setup');
+    }
+  }
+
   return (
     <div className="flex min-h-[100dvh] overflow-hidden">
       <div className="hidden md:flex">

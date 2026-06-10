@@ -1,12 +1,103 @@
+"use client";
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Camera } from "lucide-react"
-import Link from "next/link"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function SetupPage() {
+  const supabase = createClient()
+  const router = useRouter()
+  
+  const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(true)
+  const [userId, setUserId] = useState<string | null>(null)
+  
+  const [formData, setFormData] = useState({
+    username: "",
+    phone: "",
+    college: "",
+    bio: "",
+    hobbies: "",
+    instagram_handle: "",
+    linkedin_url: "",
+    twitter_handle: "",
+    youtube_channel: "",
+    github_url: "", // using twitter_handle or adding a column if needed
+  })
+
+  useEffect(() => {
+    async function checkUser() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push("/login")
+        return
+      }
+      setUserId(user.id)
+      
+      const { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single()
+      if (profile) {
+        setFormData(prev => ({
+          ...prev,
+          username: profile.username || "",
+          phone: profile.phone || "",
+          college: profile.college || "",
+          bio: profile.bio || "",
+          hobbies: profile.hobbies ? profile.hobbies.join(", ") : "",
+          instagram_handle: profile.instagram_handle || "",
+          linkedin_url: profile.linkedin_url || "",
+          twitter_handle: profile.twitter_handle || "",
+          youtube_channel: profile.youtube_channel || "",
+        }))
+      }
+      setFetching(false)
+    }
+    checkUser()
+  }, [supabase, router])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target
+    setFormData(prev => ({ ...prev, [id]: value }))
+  }
+
+  const handleSubmit = async () => {
+    if (!userId) return
+    setLoading(true)
+
+    const hobbiesArray = formData.hobbies.split(',').map(h => h.trim()).filter(Boolean)
+
+    const { error } = await supabase
+      .from('users')
+      .update({
+        username: formData.username,
+        phone: formData.phone,
+        college: formData.college,
+        bio: formData.bio,
+        hobbies: hobbiesArray,
+        instagram_handle: formData.instagram_handle,
+        linkedin_url: formData.linkedin_url,
+        twitter_handle: formData.twitter_handle,
+        youtube_channel: formData.youtube_channel,
+      })
+      .eq('id', userId)
+
+    if (error) {
+      toast.error(error.message)
+    } else {
+      toast.success("Profile saved successfully!")
+      router.push("/dashboard")
+    }
+    setLoading(false)
+  }
+
+  if (fetching) return <div className="flex h-screen items-center justify-center">Loading...</div>
+
   return (
     <div className="min-h-screen w-screen bg-muted/40 p-4 flex items-start justify-center overflow-y-auto py-12">
       <Card className="w-full max-w-3xl border-primary/20 shadow-[0_0_20px_rgba(168,85,247,0.1)]">
@@ -37,19 +128,19 @@ export default function SetupPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Username</Label>
-                <Input type="text" placeholder="e.g. shadow_kreon" />
+                <Input id="username" type="text" placeholder="e.g. shadow_kreon" value={formData.username} onChange={handleChange} />
               </div>
               <div className="space-y-2">
                 <Label>Phone Number</Label>
-                <Input type="tel" placeholder="+91 98765 43210" />
+                <Input id="phone" type="tel" placeholder="+91 98765 43210" value={formData.phone} onChange={handleChange} />
               </div>
               <div className="space-y-2">
-                <Label>College Name</Label>
-                <Input type="text" placeholder="Full college name" />
+                <Label>College Name <span className="text-red-500">*</span></Label>
+                <Input id="college" type="text" placeholder="Full college name" value={formData.college} onChange={handleChange} required />
               </div>
               <div className="space-y-2">
                 <Label>Batch Number</Label>
-                <Input type="text" placeholder="e.g. Batch 15" disabled value="Batch 15" className="bg-muted" />
+                <Input type="text" placeholder="Pending Assignment" disabled value="Pending Assignment" className="bg-muted" />
                 <p className="text-[10px] text-muted-foreground">Assigned by Management</p>
               </div>
             </div>
@@ -60,11 +151,11 @@ export default function SetupPage() {
             <h3 className="font-bold text-lg border-b pb-2">About You</h3>
             <div className="space-y-2">
               <Label>Bio / About</Label>
-              <Textarea placeholder="Passionate gamer, developer, community builder..." className="resize-none h-24" />
+              <Textarea id="bio" placeholder="Passionate gamer, developer, community builder..." className="resize-none h-24" value={formData.bio} onChange={handleChange} />
             </div>
             <div className="space-y-2">
               <Label>Interests & Tags (Comma separated)</Label>
-              <Input type="text" placeholder="Gaming, Valorant, Sci-Fi Movies, Music" />
+              <Input id="hobbies" type="text" placeholder="Gaming, Valorant, Sci-Fi Movies, Music" value={formData.hobbies} onChange={handleChange} />
             </div>
           </div>
 
@@ -74,36 +165,28 @@ export default function SetupPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Instagram</Label>
-                <Input type="url" placeholder="https://instagram.com/..." />
+                <Input id="instagram_handle" type="text" placeholder="@username or URL" value={formData.instagram_handle} onChange={handleChange} />
               </div>
               <div className="space-y-2">
                 <Label>LinkedIn</Label>
-                <Input type="url" placeholder="https://linkedin.com/in/..." />
+                <Input id="linkedin_url" type="url" placeholder="https://linkedin.com/in/..." value={formData.linkedin_url} onChange={handleChange} />
               </div>
               <div className="space-y-2">
                 <Label>Twitter / X</Label>
-                <Input type="url" placeholder="https://twitter.com/..." />
+                <Input id="twitter_handle" type="text" placeholder="@username" value={formData.twitter_handle} onChange={handleChange} />
               </div>
               <div className="space-y-2">
                 <Label>YouTube</Label>
-                <Input type="url" placeholder="https://youtube.com/@..." />
-              </div>
-              <div className="space-y-2">
-                <Label>Steam Profile</Label>
-                <Input type="url" placeholder="https://steamcommunity.com/id/..." />
-              </div>
-              <div className="space-y-2">
-                <Label>GitHub</Label>
-                <Input type="url" placeholder="https://github.com/..." />
+                <Input id="youtube_channel" type="url" placeholder="https://youtube.com/@..." value={formData.youtube_channel} onChange={handleChange} />
               </div>
             </div>
           </div>
 
         </CardContent>
         <CardFooter className="flex justify-end border-t pt-6">
-          <Link href="/dashboard">
-            <Button size="lg" className="px-10">Complete Setup</Button>
-          </Link>
+          <Button size="lg" className="px-10" onClick={handleSubmit} disabled={loading || !formData.college}>
+            {loading ? "Saving..." : "Complete Setup"}
+          </Button>
         </CardFooter>
       </Card>
     </div>

@@ -12,8 +12,6 @@ import { useRouter } from "next/navigation"
 export default function RegisterPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [name, setName] = useState("")
-  const [college, setCollege] = useState("")
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
   const router = useRouter()
@@ -25,18 +23,12 @@ export default function RegisterPage() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: {
-          full_name: name,
-          college: college,
-        }
-      },
     })
 
     if (error) {
       toast.error(error.message)
     } else {
-      toast.success("Account created successfully! Check your email to verify.")
+      toast.success("Account created! Check your email to verify if required, or login.")
       router.push("/login")
     }
     setLoading(false)
@@ -46,7 +38,7 @@ export default function RegisterPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/setup`,
       },
     })
     
@@ -60,30 +52,10 @@ export default function RegisterPage() {
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>Enter your details below to register.</CardDescription>
+          <CardDescription>Enter your email and a password to register.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <form onSubmit={handleEmailRegister} className="grid gap-4">
-            <div className="grid gap-2">
-              <Input 
-                id="name" 
-                type="text" 
-                placeholder="Full Name" 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required 
-              />
-            </div>
-            <div className="grid gap-2">
-              <Input 
-                id="college" 
-                type="text" 
-                placeholder="College Name" 
-                value={college}
-                onChange={(e) => setCollege(e.target.value)}
-                required 
-              />
-            </div>
             <div className="grid gap-2">
               <Input 
                 id="email" 
