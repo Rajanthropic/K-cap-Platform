@@ -103,12 +103,21 @@ export default function LoginPage() {
           </Button>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <div className="text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="underline">
-              Register
-            </Link>
+          <div className="relative w-full mt-2">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">
+                New to KCAP?
+              </span>
+            </div>
           </div>
+          <Link href="/register" className="w-full">
+            <Button variant="secondary" className="w-full border shadow-sm">
+              Sign Up
+            </Button>
+          </Link>
         </CardFooter>
       </Card>
     </div>
