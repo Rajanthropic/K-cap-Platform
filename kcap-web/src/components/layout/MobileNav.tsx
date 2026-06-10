@@ -37,10 +37,12 @@ export function MobileNav() {
         <Trophy className="h-5 w-5" />
         <span className="text-[10px]">Ranks</span>
       </Link>
+      {/*
       <Link href="/shop" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${pathname === '/shop' ? 'text-primary' : 'text-muted-foreground'}`}>
         <ShoppingBag className="h-5 w-5" />
         <span className="text-[10px]">Shop</span>
       </Link>
+      */}
       <Link 
         href="/notifications" 
         onClick={() => setHasUnread(false)}

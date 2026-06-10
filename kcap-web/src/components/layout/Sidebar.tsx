@@ -44,9 +44,11 @@ export function Sidebar() {
         <Link href="/leaderboard" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground">
           <Trophy className="h-4 w-4" /> Leaderboard
         </Link>
+        {/*
         <Link href="/shop" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground">
           <ShoppingBag className="h-4 w-4" /> Shop
         </Link>
+        */}
         <Link 
           href="/notifications" 
           onClick={() => setHasUnread(false)}
