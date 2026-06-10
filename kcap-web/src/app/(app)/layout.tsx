@@ -4,6 +4,9 @@ import { ModeToggle } from "@/components/theme-toggle";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function AppLayout({
   children,
 }: {

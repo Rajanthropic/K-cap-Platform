@@ -95,6 +95,7 @@ export default function SetupPage() {
         username: formData.username,
         phone: formData.phone,
         college: formData.college,
+        batch: formData.batch,
         bio: formData.bio,
         hobbies: hobbiesArray,
         instagram_handle: formData.instagram_handle,
@@ -107,8 +108,11 @@ export default function SetupPage() {
     if (error) {
       toast.error(error.message)
     } else {
-      toast.success("Profile saved successfully!")
-      window.location.href = "/u/me"
+      // Small delay to ensure the database update has fully committed before redirecting
+      setTimeout(() => {
+        toast.success("Profile saved successfully!")
+        window.location.href = "/u/me"
+      }, 500)
     }
     setLoading(false)
   }
