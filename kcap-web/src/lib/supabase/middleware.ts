@@ -27,9 +27,13 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
+  // Use getSession instead of getUser in middleware to avoid Vercel Edge timeouts
+  // getSession only decodes the JWT and doesn't make a network request
   const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    data: { session },
+  } = await supabase.auth.getSession()
+  
+  const user = session?.user
 
   // Check if route is protected
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register') || request.nextUrl.pathname.startsWith('/auth')
