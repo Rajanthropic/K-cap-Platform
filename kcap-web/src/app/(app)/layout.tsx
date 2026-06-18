@@ -15,6 +15,10 @@ export default async function AppLayout({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  if (!user) {
+    redirect('/login');
+  }
+
   if (user) {
     const { data: profile } = await supabase.from('users').select('college').eq('id', user.id).single();
     if (!profile?.college) {
