@@ -1,3 +1,5 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,9 +17,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { CalendarDays, MapPin, Users, PlusCircle } from "lucide-react";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export default function TimelinePage() {
   const events: any[] = [];
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success("Event request submitted successfully! Management will review it shortly.");
+    setIsOpen(false);
+  };
 
   return (
     <div className="max-w-[95%] 2xl:max-w-[1600px] mx-auto space-y-6">
@@ -27,9 +38,11 @@ export default function TimelinePage() {
           <p className="text-muted-foreground">See what's happening in the community and join events.</p>
         </div>
         
-        <Dialog>
-          <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 gap-2">
-            <PlusCircle className="h-4 w-4" /> Host Event
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button className="h-10 px-4 py-2 gap-2">
+              <PlusCircle className="h-4 w-4" /> Host Event
+            </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
@@ -38,47 +51,49 @@ export default function TimelinePage() {
                 Submit your event details. Management will review and approve it.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="title">Event Title</Label>
-                <Input id="title" placeholder="e.g. Weekend Gaming Session" />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="type">Event Type</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="watch_party">Watch Party</SelectItem>
-                    <SelectItem value="gaming">Gaming Session</SelectItem>
-                    <SelectItem value="learning">Learning Program</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit}>
+              <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="date">Date & Time</Label>
-                  <Input id="date" type="datetime-local" />
+                  <Label htmlFor="title">Event Title</Label>
+                  <Input id="title" placeholder="e.g. Weekend Gaming Session" required />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="maxp">Max Participants</Label>
-                  <Input id="maxp" type="number" placeholder="Optional" />
+                  <Label htmlFor="type">Event Type</Label>
+                  <Select required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="watch_party">Watch Party</SelectItem>
+                      <SelectItem value="gaming">Gaming Session</SelectItem>
+                      <SelectItem value="learning">Learning Program</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="date">Date & Time</Label>
+                    <Input id="date" type="datetime-local" required />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="maxp">Max Participants</Label>
+                    <Input id="maxp" type="number" placeholder="Optional" />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="link">Platform / Join Link</Label>
+                  <Input id="link" placeholder="https://discord.gg/..." required />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="desc">Description</Label>
+                  <Textarea id="desc" placeholder="What is this event about?" required />
                 </div>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="link">Platform / Join Link</Label>
-                <Input id="link" placeholder="https://discord.gg/..." />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="desc">Description</Label>
-                <Textarea id="desc" placeholder="What is this event about?" />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit">Submit Request</Button>
-            </DialogFooter>
+              <DialogFooter>
+                <Button type="submit">Submit Request</Button>
+              </DialogFooter>
+            </form>
           </DialogContent>
         </Dialog>
       </div>
