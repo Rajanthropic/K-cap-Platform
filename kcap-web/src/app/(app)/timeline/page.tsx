@@ -17,28 +17,7 @@ import {
 import { CalendarDays, MapPin, Users, PlusCircle } from "lucide-react";
 
 export default function TimelinePage() {
-  const events = [
-    {
-      id: "e1",
-      title: "Valorant Tournament Finals - Watch Party",
-      type: "Watch Party",
-      host: "John Doe",
-      date: "Jun 15, 2026 - 8:00 PM",
-      platform: "Discord Server",
-      participants: 45,
-      description: "Join us for the grand finals of the CRIO Valorant tournament. We'll be streaming it live on Discord and giving away some spot prizes!"
-    },
-    {
-      id: "e2",
-      title: "Intro to Open Source with CRIO",
-      type: "Learning Program",
-      host: "Jane Smith",
-      date: "Jun 18, 2026 - 6:00 PM",
-      platform: "Google Meet",
-      participants: 120,
-      description: "A beginner-friendly session on how to make your first open-source contribution."
-    }
-  ];
+  const events: any[] = [];
 
   return (
     <div className="max-w-[95%] 2xl:max-w-[1600px] mx-auto space-y-6">
@@ -112,7 +91,7 @@ export default function TimelinePage() {
       </div>
 
       <div className="space-y-6">
-        {events.map(event => (
+        {events.length > 0 ? events.map(event => (
           <Card key={event.id}>
             <CardHeader>
               <div className="flex justify-between items-start">
@@ -146,7 +125,11 @@ export default function TimelinePage() {
               <Button className="w-full sm:w-auto">RSVP - I'm In!</Button>
             </CardFooter>
           </Card>
-        ))}
+        )) : (
+          <div className="text-center text-muted-foreground py-12 border rounded-xl border-dashed">
+            No events scheduled yet. Check back later or host your own!
+          </div>
+        )}
       </div>
     </div>
   );
