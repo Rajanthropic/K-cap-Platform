@@ -220,7 +220,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                     <div className="space-y-2">
                       <Textarea placeholder="Share your thoughts or suggest a mission idea..." className="resize-none border-primary/20 focus-visible:ring-primary/30" />
                       <div className="flex justify-end">
-                        <Button size="sm" className="gap-2"><Send className="h-3 w-3" /> Submit Idea</Button>
+                        <Button size="sm" className="gap-2" onClick={() => toast.success("Idea submitted successfully!")}><Send className="h-3 w-3" /> Submit Idea</Button>
                       </div>
                     </div>
                   )}
@@ -287,7 +287,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                         <Textarea placeholder="Logo placement, dedicated stall, shoutouts..." className="resize-none" />
                       </div>
 
-                      <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">Submit Event Pitch</Button>
+                      <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white" onClick={() => toast.success("Event pitch submitted successfully!")}>Submit Event Pitch</Button>
                     </div>
                   )}
                 </div>
