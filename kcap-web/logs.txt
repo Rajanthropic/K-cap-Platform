@@ -1,0 +1,14 @@
+
+> kcap-web@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.7 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://172.17.0.81:3000
+- Environments: .env.local, .env
+✓ Ready in 1479ms
+
+ GET / 307 in 769ms (next.js: 426ms, application-code: 343ms)
+ GET /dashboard 307 in 1093ms (next.js: 205ms, application-code: 888ms)
+ GET /login 200 in 294ms (next.js: 87ms, application-code: 207ms)
+✓ Compiled in 1741ms

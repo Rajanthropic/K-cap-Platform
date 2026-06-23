@@ -4,37 +4,32 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { createClient } from "@/lib/supabase/client"
 import { useState } from "react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { register } from "@/app/actions/auth"
 
 export default function RegisterPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
-  const supabase = createClient()
   const router = useRouter()
 
-  const handleEmailRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleEmailRegister = async (formData: FormData) => {
     setLoading(true)
     
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
+    const result = await register(formData);
 
-    if (error) {
-      toast.error(error.message)
+    if (result?.error) {
+      toast.error(result.error)
+      setLoading(false)
     } else {
-      toast.success("Account created! Check your email to verify if required, or login.")
+      toast.success("Account created! Logging you in...")
       router.push("/login")
     }
-    setLoading(false)
   }
 
   const handleGoogleRegister = async () => {
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -55,24 +50,22 @@ export default function RegisterPage() {
           <CardDescription>Enter your email and a password to register.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <form onSubmit={handleEmailRegister} className="grid gap-4">
+          <form action={handleEmailRegister} className="grid gap-4">
             <div className="grid gap-2">
               <Input 
                 id="email" 
+                name="email"
                 type="email" 
                 placeholder="m@example.com" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required 
               />
             </div>
             <div className="grid gap-2">
               <Input 
                 id="password" 
+                name="password"
                 type="password" 
                 placeholder="Password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 required 
                 minLength={6}
               />

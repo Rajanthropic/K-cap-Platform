@@ -6,11 +6,5 @@
 - Local:         http://localhost:3000
 - Network:       http://172.17.0.81:3000
 - Environments: .env.local, .env
-✓ Ready in 870ms
+✓ Ready in 2.1s
 
- GET / 307 in 766ms (next.js: 282ms, proxy.ts: 138ms, application-code: 346ms)
- GET /login 200 in 357ms (next.js: 65ms, proxy.ts: 7ms, application-code: 285ms)
- GET / 307 in 117ms (next.js: 9ms, proxy.ts: 11ms, application-code: 97ms)
- GET /login 200 in 74ms (next.js: 5ms, proxy.ts: 17ms, application-code: 52ms)
- GET /register 200 in 1560ms (next.js: 1522ms, proxy.ts: 7ms, application-code: 32ms)
- GET /register 200 in 86ms (next.js: 7ms, proxy.ts: 10ms, application-code: 69ms)
