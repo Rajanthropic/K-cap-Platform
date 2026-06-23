@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,10 +39,8 @@ export default function TimelinePage() {
         </div>
         
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button className="h-10 px-4 py-2 gap-2">
-              <PlusCircle className="h-4 w-4" /> Host Event
-            </Button>
+          <DialogTrigger className={buttonVariants({ className: "h-10 px-4 py-2 gap-2" })}>
+            <PlusCircle className="h-4 w-4" /> Host Event
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>

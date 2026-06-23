@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const resolvedParams = use(params);
