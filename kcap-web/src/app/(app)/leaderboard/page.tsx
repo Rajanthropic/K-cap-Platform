@@ -12,14 +12,8 @@ import {
 } from "@/components/ui/table";
 
 export default function LeaderboardPage() {
-  const leaders = [
-    { rank: 1, name: "Alice Johnson", username: "alicej", college: "NIT Trichy", batch: "Batch 14", credits: 2450, overachiever: true },
-    { rank: 2, name: "Bob Smith", username: "bobsmith", college: "IIT Delhi", batch: "Batch 14", credits: 2100, overachiever: false },
-    { rank: 3, name: "Charlie Davis", username: "charlied", college: "BITS Pilani", batch: "Batch 15", credits: 1950, overachiever: true },
-    { rank: 4, name: "Diana Prince", username: "dianap", college: "VIT Vellore", batch: "Batch 15", credits: 1800, overachiever: false },
-    { rank: 5, name: "Eve Adams", username: "evea", college: "SRM Chennai", batch: "Batch 13", credits: 1650, overachiever: false },
-    // ... skipping 6-11 for brevity
-    { rank: 12, name: "John Doe", username: "johndoe", college: "IIT Bombay", batch: "Batch 15", credits: 1200, overachiever: false, isMe: true },
+  const leaders: any[] = [
+    // Data will be fetched from database here
   ];
 
   return (
@@ -39,14 +33,14 @@ export default function LeaderboardPage() {
         <CardHeader className="bg-primary/5 border-b pb-4">
           <CardTitle className="flex justify-between items-center text-lg font-medium">
             <span>Your Ranking</span>
-            <span className="text-sm font-normal text-muted-foreground">You're 450 Kreds away from Top 5 — keep going!</span>
+            <span className="text-sm font-normal text-muted-foreground">Complete missions to climb the leaderboard!</span>
           </CardTitle>
           <div className="flex items-center gap-4 pt-4">
-            <div className="text-3xl font-bold text-primary">#12</div>
+            <div className="text-3xl font-bold text-primary">-</div>
             <div className="flex-1 bg-muted h-2 rounded-full overflow-hidden">
-              <div className="bg-primary h-full w-[45%]" />
+              <div className="bg-primary h-full w-[0%]" />
             </div>
-            <div className="text-sm font-medium">1,200 Kreds</div>
+            <div className="text-sm font-medium">0 Kreds</div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -60,7 +54,7 @@ export default function LeaderboardPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {leaders.map((leader) => (
+              {leaders.length > 0 ? leaders.map((leader) => (
                 <TableRow key={leader.rank} className={leader.isMe ? "bg-muted/50 font-medium" : ""}>
                   <TableCell className="text-center font-bold">
                     {leader.rank === 1 && <Trophy className="h-5 w-5 text-yellow-500 mx-auto" />}
@@ -89,7 +83,11 @@ export default function LeaderboardPage() {
                     {leader.credits.toLocaleString()}
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-muted-foreground h-24">No rankings yet. Start completing missions!</TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

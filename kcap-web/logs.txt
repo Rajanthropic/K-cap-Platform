@@ -12,3 +12,7 @@
  GET /dashboard 307 in 1093ms (next.js: 205ms, application-code: 888ms)
  GET /login 200 in 294ms (next.js: 87ms, application-code: 207ms)
 ✓ Compiled in 1741ms
+✓ Compiled in 291ms
+✓ Compiled in 281ms
+✓ Compiled in 79ms
+✓ Compiled in 67ms

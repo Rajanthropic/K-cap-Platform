@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, use } from "react";
+import { useState, use, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,13 +13,43 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { createClient } from "@/lib/supabase/client";
 
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
-  // Mock data
   const resolvedParams = use(params);
-  const isMe = resolvedParams.username === 'me' || resolvedParams.username === 'johndoe';
   const [ideaMode, setIdeaMode] = useState<"idea" | "event">("idea");
   
+  const [profile, setProfile] = useState<any>(null);
+  const [isMe, setIsMe] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetchProfile() {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      let queryUsername = resolvedParams.username;
+      
+      if (queryUsername === 'me') {
+        if (!user) return;
+        setIsMe(true);
+        const { data } = await supabase.from('users').select('*').eq('id', user.id).single();
+        setProfile(data);
+      } else {
+        const { data } = await supabase.from('users').select('*').eq('username', queryUsername).single();
+        if (user && data && user.id === data.id) {
+          setIsMe(true);
+        }
+        setProfile(data);
+      }
+      setLoading(false);
+    }
+    fetchProfile();
+  }, [resolvedParams.username, supabase]);
+
+  if (loading) return <div className="p-8 text-center">Loading profile...</div>;
+  if (!profile) return <div className="p-8 text-center">Profile not found.</div>;
+
   return (
     <div className="max-w-[95%] 2xl:max-w-[1600px] mx-auto space-y-6">
       {/* Header Profile Card */}
@@ -29,8 +59,8 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             <div className="flex gap-6 items-center">
               <div className="relative">
                 <Avatar className="h-24 w-24">
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarImage src={profile.avatar_url || ""} />
+                  <AvatarFallback>{profile.full_name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
                 {isMe && (
                   <button className="absolute bottom-0 right-0 p-1.5 bg-primary text-primary-foreground rounded-full border-2 border-background hover:scale-105 transition-transform" title="Change Profile Picture">
@@ -40,21 +70,21 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold">John Doe</h1>
-                  <Badge variant="secondary">Batch 15</Badge>
+                  <h1 className="text-2xl font-bold">{profile.full_name}</h1>
+                  {profile.batch && <Badge variant="secondary">{profile.batch}</Badge>}
                 </div>
-                <p className="text-muted-foreground">@{resolvedParams.username === 'me' ? 'johndoe' : resolvedParams.username}</p>
+                <p className="text-muted-foreground">@{profile.username || 'username_not_set'}</p>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground pt-2">
-                  <div className="flex items-center gap-1"><MapPin className="h-4 w-4" /> IIT Bombay</div>
-                  <div className="flex items-center gap-1"><CalendarDays className="h-4 w-4" /> Joined Jun 2026</div>
+                  {profile.college && <div className="flex items-center gap-1"><MapPin className="h-4 w-4" /> {profile.college}</div>}
+                  <div className="flex items-center gap-1"><CalendarDays className="h-4 w-4" /> Joined {new Date(profile.joined_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</div>
                 </div>
               </div>
             </div>
             <div className="flex flex-col gap-2 items-end">
               <div className="bg-primary/10 text-primary px-4 py-2 rounded-lg font-bold text-lg text-center">
-                150 <span className="text-sm font-normal">Kreds</span>
+                {profile.kreds || 0} <span className="text-sm font-normal">Kreds</span>
               </div>
-              {isMe && <Button variant="outline" className="w-full">Edit Profile</Button>}
+              {isMe && <Button variant="outline" className="w-full" onClick={() => window.location.href = '/setup'}>Edit Profile</Button>}
               {isMe && <Button className="w-full gap-2"><Share2 className="h-4 w-4" /> Share Report Card</Button>}
             </div>
           </div>
@@ -69,122 +99,61 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               <CardTitle className="text-lg">About</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm">Passionate developer and community builder. Always ready to learn and share knowledge!</p>
+              <p className="text-sm">{profile.bio || "No bio added yet."}</p>
               <div className="space-y-3 pt-2">
-                <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors group">
-                  <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                    <FaInstagram className="h-4 w-4" />
+                {profile.instagram_handle && (
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors group">
+                    <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                      <FaInstagram className="h-4 w-4" />
+                    </div>
+                    <a href={profile.instagram_handle.startsWith('http') ? profile.instagram_handle : `https://instagram.com/${profile.instagram_handle.replace('@', '')}`} target="_blank" rel="noreferrer" className="hover:underline font-medium">{profile.instagram_handle}</a>
                   </div>
-                  <a href="#" className="hover:underline font-medium">@johndoe_kreo</a>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors group">
-                  <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                    <FaTwitter className="h-4 w-4" />
+                )}
+                {profile.twitter_handle && (
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors group">
+                    <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                      <FaTwitter className="h-4 w-4" />
+                    </div>
+                    <a href={`https://twitter.com/${profile.twitter_handle.replace('@', '')}`} target="_blank" rel="noreferrer" className="hover:underline font-medium">{profile.twitter_handle}</a>
                   </div>
-                  <a href="#" className="hover:underline font-medium">@johndoe</a>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors group">
-                  <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                    <FaYoutube className="h-4 w-4" />
+                )}
+                {profile.youtube_channel && (
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors group">
+                    <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                      <FaYoutube className="h-4 w-4" />
+                    </div>
+                    <a href={profile.youtube_channel} target="_blank" rel="noreferrer" className="hover:underline font-medium">YouTube</a>
                   </div>
-                  <a href="#" className="hover:underline font-medium">JohnDoeGaming</a>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors group">
-                  <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                    <FaSteam className="h-4 w-4" />
+                )}
+                {profile.linkedin_url && (
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors group">
+                    <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                      <FaLinkedin className="h-4 w-4" />
+                    </div>
+                    <a href={profile.linkedin_url} target="_blank" rel="noreferrer" className="hover:underline font-medium">LinkedIn</a>
                   </div>
-                  <a href="#" className="hover:underline font-medium">Steam: johndoe_99</a>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors group">
-                  <div className="h-8 w-8 rounded-md bg-muted flex items-center justify-center group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                    <FaLinkedin className="h-4 w-4" />
-                  </div>
-                  <a href="#" className="hover:underline font-medium">linkedin.com/in/johndoe</a>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>
           
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Interests</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-semibold text-muted-foreground">Favorite Character</h4>
-                  {isMe && <Button variant="ghost" size="sm" className="h-6 text-xs px-2 text-muted-foreground hover:text-foreground"><ImagePlus className="h-3 w-3 mr-1" /> Change Image</Button>}
-                </div>
-                <div className="flex items-center gap-3 bg-muted p-3 rounded-lg border border-border/50">
-                  <div className="h-10 w-10 rounded-full bg-black flex items-center justify-center overflow-hidden">
-                    <img src="https://placehold.co/100x100/1a1a1a/ffffff?text=🦇" alt="Batman" />
-                  </div>
-                  <div>
-                    <div className="font-bold">Batman</div>
-                    <div className="text-xs text-muted-foreground">DC Comics</div>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-muted-foreground mb-2">Tags</h4>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="outline">Gaming</Badge>
-                  <Badge variant="outline">Valorant</Badge>
-                  <Badge variant="outline">Music</Badge>
-                  <Badge variant="outline">Sci-Fi Movies</Badge>
-                  <Badge variant="outline">Chess</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Unavailability</CardTitle>
-                {isMe && (
-                  <Dialog>
-                    <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0 text-muted-foreground">
-                        <Edit3 className="h-4 w-4" />
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Update Unavailability</DialogTitle>
-                        <DialogDescription>Let management know when you'll be unavailable for missions.</DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                          <Label>Reason (e.g. Mid-term Exams)</Label>
-                          <Input placeholder="Enter reason" defaultValue="Mid-term Exams" />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label>Start Date</Label>
-                            <Input type="date" defaultValue="2026-10-15" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>End Date</Label>
-                            <Input type="date" defaultValue="2026-10-25" />
-                          </div>
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button type="submit">Save Changes</Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 p-3 rounded-lg text-sm flex items-start gap-2">
-                <CalendarDays className="h-4 w-4 shrink-0 mt-0.5" />
+          {profile.hobbies && profile.hobbies.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Interests</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div>
-                  <span className="font-semibold">Mid-term Exams</span>
-                  <p className="mt-1 opacity-80">Unavailable from Oct 15 - Oct 25, 2026</p>
+                  <h4 className="text-sm font-semibold text-muted-foreground mb-2">Tags</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.hobbies.map((hobby: string, i: number) => (
+                      <Badge key={i} variant="outline">{hobby}</Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Right Column */}
@@ -195,19 +164,19 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             </CardHeader>
             <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-xl shadow-sm">
-                <div className="text-3xl font-black text-primary">1/2</div>
+                <div className="text-3xl font-black text-primary">0</div>
                 <div className="text-xs font-semibold text-muted-foreground mt-1 uppercase tracking-wider">Missions Done</div>
               </div>
               <div className="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-xl shadow-sm">
-                <div className="text-3xl font-black text-primary">1200</div>
+                <div className="text-3xl font-black text-primary">{profile.kreds || 0}</div>
                 <div className="text-xs font-semibold text-muted-foreground mt-1 uppercase tracking-wider">Kreds Earned</div>
               </div>
               <div className="text-center p-4 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-xl shadow-sm">
-                <div className="text-3xl font-black text-primary">3</div>
+                <div className="text-3xl font-black text-primary">0</div>
                 <div className="text-xs font-semibold text-muted-foreground mt-1 uppercase tracking-wider">Events Hosted</div>
               </div>
               <div className="text-center p-4 bg-gradient-to-br from-red-500/10 to-red-500/5 border border-red-500/20 rounded-xl shadow-sm">
-                <div className="text-3xl font-black text-red-500">1</div>
+                <div className="text-3xl font-black text-red-500">0</div>
                 <div className="text-xs font-semibold text-red-600/80 mt-1 uppercase tracking-wider">Missions Declined</div>
               </div>
             </CardContent>
@@ -218,22 +187,10 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               <CardTitle className="text-lg">Recent Missions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
-                <div>
-                  <h4 className="font-semibold">Instagram Reel: CRIO Launch</h4>
-                  <p className="text-sm text-muted-foreground">Content • Completed on Jun 1, 2026</p>
-                </div>
-                <Badge className="bg-green-500/10 text-green-500 hover:bg-green-500/20">+50 Kreds</Badge>
-              </div>
-              <div className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
-                <div>
-                  <h4 className="font-semibold">Host a College Watch Party</h4>
-                  <p className="text-sm text-muted-foreground">Offline Event • Completed on May 25, 2026</p>
-                </div>
-                <Badge className="bg-green-500/10 text-green-500 hover:bg-green-500/20">+100 Kreds</Badge>
-              </div>
+              <div className="text-sm text-muted-foreground text-center py-4">No recent missions.</div>
             </CardContent>
           </Card>
+          
           <Card className={`transition-colors duration-300 ${ideaMode === 'event' ? 'border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.1)]' : 'border-primary/50 shadow-[0_0_15px_rgba(168,85,247,0.1)]'}`}>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -267,13 +224,6 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                       </div>
                     </div>
                   )}
-                  <div className="border p-4 rounded-lg bg-primary/5 border-primary/10">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-bold">Campus Treasure Hunt</h4>
-                      <Badge variant="secondary" className="bg-background">Pending Review</Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">A campus-wide QR code treasure hunt that leads to a Kreo merchandise popup stall.</p>
-                  </div>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -282,11 +232,11 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label>Phone Number</Label>
-                          <Input placeholder="+91 98765 43210" />
+                          <Input placeholder="+91 98765 43210" defaultValue={profile.phone || ""} />
                         </div>
                         <div className="space-y-2">
                           <Label>College Name</Label>
-                          <Input placeholder="Enter college" defaultValue="IIT Bombay" />
+                          <Input placeholder="Enter college" defaultValue={profile.college || ""} />
                         </div>
                       </div>
                       
@@ -335,50 +285,6 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                       <div className="space-y-2">
                         <Label>What can you offer in return?</Label>
                         <Textarea placeholder="Logo placement, dedicated stall, shoutouts..." className="resize-none" />
-                      </div>
-
-                      <div className="space-y-3">
-                        <Label>Social Media Deliverables</Label>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox id="d-post" />
-                            <label htmlFor="d-post" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Insta Post</label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox id="d-reel" />
-                            <label htmlFor="d-reel" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Insta Reel</label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox id="d-story" />
-                            <label htmlFor="d-story" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Insta Story</label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox id="d-twitter" />
-                            <label htmlFor="d-twitter" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Twitter Post</label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox id="d-yt-short" />
-                            <label htmlFor="d-yt-short" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">YT Short</label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox id="d-yt-long" />
-                            <label htmlFor="d-yt-long" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">YT Long Form</label>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3 pt-2 border-t border-border/50">
-                        <Label>Point of Contact (If different)</Label>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                          <Input placeholder="POC Name" className="text-sm" />
-                          <Input placeholder="POC Email" type="email" className="text-sm" />
-                          <Input placeholder="POC Contact" className="text-sm" />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Additional Notes</Label>
-                        <Textarea placeholder="Any other details..." className="resize-none h-16" />
                       </div>
 
                       <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">Submit Event Pitch</Button>
