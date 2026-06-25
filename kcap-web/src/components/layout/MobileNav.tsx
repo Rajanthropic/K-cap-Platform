@@ -56,10 +56,10 @@ export function MobileNav() {
         </div>
         <span className="text-[10px]">Alerts</span>
       </Link>
-      <button onClick={handleLogout} className="flex flex-col items-center justify-center w-full h-full space-y-1 text-muted-foreground hover:text-red-500 transition-colors">
-        <LogOut className="h-5 w-5" />
-        <span className="text-[10px]">Logout</span>
-      </button>
+      <Link href="/u/me" className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${pathname === '/u/me' ? 'text-primary' : 'text-muted-foreground'}`}>
+        <User className="h-5 w-5" />
+        <span className="text-[10px]">Profile</span>
+      </Link>
     </div>
   );
 }

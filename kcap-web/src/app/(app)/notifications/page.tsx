@@ -15,28 +15,12 @@ type Notification = {
 const initialNotifications: Notification[] = [
   {
     id: "1",
-    title: "Mission Approved! 🎉",
-    description: "Your submission for 'KCAP Launch Reel' has been approved. You earned 150 Kreds!",
-    time: "2 hours ago",
+    title: "Welcome to KCAP! 🎉",
+    description: "You've been awarded 50 Kreds for signing up. Head over to the Missions tab to earn more!",
+    time: "Just now",
     type: "success",
     reaction: null,
-  },
-  {
-    id: "2",
-    title: "New Mission Available",
-    description: "A new mission 'Host a Watch Party' has been published. Enroll now!",
-    time: "5 hours ago",
-    type: "info",
-    reaction: null,
-  },
-  {
-    id: "3",
-    title: "Top 10 on the Leaderboard!",
-    description: "Congratulations! You just cracked the top 10 on the global leaderboard.",
-    time: "1 day ago",
-    type: "success",
-    reaction: null,
-  },
+  }
 ];
 
 const emojis = ["🔥", "❤️", "👍", "👏", "🎉"];

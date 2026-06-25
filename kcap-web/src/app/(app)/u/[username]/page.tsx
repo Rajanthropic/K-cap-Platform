@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CalendarDays, MapPin, Link as LinkIcon, Share2, Gamepad2, Camera, ImagePlus, Edit3, Send } from "lucide-react";
+import { CalendarDays, MapPin, Link as LinkIcon, Share2, Gamepad2, Camera, ImagePlus, Edit3, Send, LogOut } from "lucide-react";
 import { FaInstagram, FaTwitter, FaYoutube, FaGithub, FaSteam, FaLinkedin } from "react-icons/fa";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,15 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const [isMe, setIsMe] = useState(false);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(error.message);
+    } else {
+      window.location.href = '/login';
+    }
+  };
 
   useEffect(() => {
     async function fetchProfile() {
@@ -297,6 +306,13 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
           </Card>
         </div>
       </div>
+      {isMe && (
+        <div className="flex justify-center pt-8 md:hidden">
+          <Button variant="destructive" className="gap-2 px-8 w-full max-w-sm" onClick={handleLogout}>
+            <LogOut className="h-4 w-4" /> Log Out
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

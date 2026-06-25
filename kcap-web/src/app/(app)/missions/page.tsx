@@ -1,9 +1,10 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { CalendarDays, Users, Database, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export default async function MissionsPage() {
   const supabase = await createClient();
@@ -76,9 +77,31 @@ export default async function MissionsPage() {
               )}
             </CardContent>
             <CardFooter className="flex gap-4 border-t pt-4">
-              <Link href={mission.id === 'tutorial' ? '#' : `/missions/${mission.id}`} className="flex-1">
-                <Button className="w-full">{mission.id === 'tutorial' ? 'Read Tutorial' : 'View & Enroll'}</Button>
-              </Link>
+              {mission.id === 'tutorial' ? (
+                <Dialog>
+                  <DialogTrigger className={buttonVariants({ className: "w-full" })}>
+                    Read Tutorial
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[500px]">
+                    <DialogHeader>
+                      <DialogTitle>How to Use KCAP</DialogTitle>
+                      <DialogDescription>
+                        Welcome to the Campus Ambassador Platform!
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4 text-sm">
+                      <p><strong>1. Profile & Setup:</strong> Ensure your profile is up to date with your social links and avatar so we can track your awesome work.</p>
+                      <p><strong>2. Missions:</strong> Browse this tab to find tasks (like posting reels or hosting events). Complete them and submit proof to earn Kreds.</p>
+                      <p><strong>3. Kreds & Shop:</strong> Kreds are your currency. The more missions you do, the more Kreds you get to spend in the Shop (coming soon!).</p>
+                      <p><strong>4. Timeline:</strong> Have an idea for a cool offline event? Pitch it in your profile or view approved community events on the Timeline.</p>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              ) : (
+                <Link href={`/missions/${mission.id}`} className="flex-1">
+                  <Button className="w-full">View & Enroll</Button>
+                </Link>
+              )}
               {mission.id !== 'tutorial' && <Button variant="outline" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 border-red-200 dark:border-red-900">Decline</Button>}
             </CardFooter>
           </Card>
