@@ -23,12 +23,15 @@ export default async function AppLayout({
   let initial = "U";
 
   if (user) {
-    const { data: profile } = await supabase.from('users').select('college, kreds, full_name').eq('id', user.id).single();
-    if (!profile?.college) {
+    const { data: profile } = await supabase.from('users').select('role, college, kreds, full_name').eq('id', user.id).single();
+    
+    // Only force Kreons to complete setup (management can skip college requirement)
+    if (profile?.role === 'kreon' && !profile?.college) {
       redirect('/setup');
     }
-    kreds = profile.kreds || 0;
-    initial = profile.full_name ? profile.full_name.charAt(0).toUpperCase() : "U";
+    
+    kreds = profile?.kreds || 0;
+    initial = profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : "U";
   }
 
   return (

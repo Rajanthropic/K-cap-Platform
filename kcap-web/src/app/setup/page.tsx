@@ -267,7 +267,7 @@ export default function SetupPage() {
 
         </CardContent>
         <CardFooter className="flex justify-end border-t pt-6">
-          <Button size="lg" className="px-10" onClick={handleSubmit} disabled={loading || !formData.college}>
+          <Button size="lg" className="px-10" onClick={handleSubmit} disabled={loading}>
             {loading ? "Saving..." : "Complete Setup"}
           </Button>
         </CardFooter>
