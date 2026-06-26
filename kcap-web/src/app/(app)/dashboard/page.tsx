@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { ExportCSVButton } from "@/components/ExportCSVButton";
 import { createClient } from "@/lib/supabase/server";
+import CommunityFeed from "@/components/CommunityFeed";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -56,35 +57,7 @@ export default async function DashboardPage() {
         </div>
         
         {/* Social Feed Component */}
-        <div className="mt-8 space-y-4">
-          <h2 className="text-xl font-bold border-b pb-2">Community Feed</h2>
-          
-          <Card className="bg-muted/30">
-            <CardContent className="p-4">
-              <div className="flex gap-4">
-                <div className="h-10 w-10 rounded-full bg-accent flex items-center justify-center font-bold text-muted-foreground shrink-0">
-                  {profile?.full_name?.charAt(0) || 'U'}
-                </div>
-                <div className="flex-1 space-y-3">
-                  <textarea 
-                    placeholder="Share what you played today, an idea, or an update!" 
-                    className="w-full bg-transparent border-b border-primary/20 focus:border-primary outline-none resize-none p-2 text-sm"
-                    rows={2}
-                  />
-                  <div className="flex justify-end">
-                    <Button size="sm" disabled>Post Update</Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="space-y-4 pt-4">
-            <div className="text-center text-muted-foreground py-12 border rounded-xl border-dashed">
-              No posts yet. Be the first to share an update!
-            </div>
-          </div>
-        </div>
+        <CommunityFeed currentUser={profile} />
 
       </div>
     );
