@@ -19,11 +19,16 @@ export default async function AppLayout({
     redirect('/login');
   }
 
+  let kreds = 0;
+  let initial = "U";
+
   if (user) {
-    const { data: profile } = await supabase.from('users').select('college').eq('id', user.id).single();
+    const { data: profile } = await supabase.from('users').select('college, kreds, full_name').eq('id', user.id).single();
     if (!profile?.college) {
       redirect('/setup');
     }
+    kreds = profile.kreds || 0;
+    initial = profile.full_name ? profile.full_name.charAt(0).toUpperCase() : "U";
   }
 
   return (
@@ -35,9 +40,9 @@ export default async function AppLayout({
         <header className="flex h-14 shrink-0 items-center justify-end border-b px-4 md:px-6 bg-background/80 backdrop-blur-md sticky top-0 z-40">
           <div className="flex items-center gap-3 md:gap-4">
             <ModeToggle />
-            <div className="text-sm font-medium hidden sm:block">Kreds: <span className="text-primary">150</span></div>
-            <div className="text-sm font-medium sm:hidden"><span className="text-primary font-bold">150</span> K</div>
-            <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center text-sm font-bold shrink-0">U</div>
+            <div className="text-sm font-medium hidden sm:block">Kreds: <span className="text-primary">{kreds}</span></div>
+            <div className="text-sm font-medium sm:hidden"><span className="text-primary font-bold">{kreds}</span> K</div>
+            <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center text-sm font-bold shrink-0">{initial}</div>
           </div>
         </header>
         <div className="flex-1 p-4 md:p-6 pb-24 md:pb-6">

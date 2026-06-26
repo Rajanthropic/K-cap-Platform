@@ -21,6 +21,7 @@ export default function SetupPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [formData, setFormData] = useState({
+    full_name: "",
     username: "",
     phone: "",
     college: "",
@@ -49,6 +50,7 @@ export default function SetupPage() {
       if (profile) {
         setFormData(prev => ({
           ...prev,
+          full_name: profile.full_name || "",
           username: profile.username || "",
           phone: profile.phone || "",
           college: profile.college || "",
@@ -92,6 +94,7 @@ export default function SetupPage() {
     const { error } = await supabase
       .from('users')
       .update({
+        full_name: formData.full_name,
         username: formData.username,
         phone: formData.phone,
         college: formData.college,
@@ -102,6 +105,7 @@ export default function SetupPage() {
         linkedin_url: formData.linkedin_url,
         twitter_handle: formData.twitter_handle,
         youtube_channel: formData.youtube_channel,
+        kreds: 50 // Give 50 kreds for completing setup
       })
       .eq('id', userId)
 
@@ -163,6 +167,10 @@ export default function SetupPage() {
           <div className="space-y-4">
             <h3 className="font-bold text-lg border-b pb-2">Basic Details</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Full Name <span className="text-red-500">*</span></Label>
+                <Input id="full_name" type="text" placeholder="Your real name" value={formData.full_name} onChange={handleChange} required />
+              </div>
               <div className="space-y-2">
                 <Label>Username</Label>
                 <Input id="username" type="text" placeholder="e.g. shadow_kreon" value={formData.username} onChange={handleChange} />

@@ -3,7 +3,7 @@
 import { useState, use, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CalendarDays, MapPin, Link as LinkIcon, Share2, Gamepad2, Camera, ImagePlus, Edit3, Send, LogOut } from "lucide-react";
 import { FaInstagram, FaTwitter, FaYoutube, FaGithub, FaSteam, FaLinkedin } from "react-icons/fa";
@@ -57,6 +57,14 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     fetchProfile();
   }, [resolvedParams.username, supabase]);
 
+  const [ideaText, setIdeaText] = useState("");
+  
+  const handleIdeaSubmit = () => {
+    if (!ideaText.trim()) return;
+    toast.success("Idea submitted successfully!");
+    setIdeaText("");
+  };
+
   if (loading) return <div className="p-8 text-center">Loading profile...</div>;
   if (!profile) return <div className="p-8 text-center">Profile not found.</div>;
 
@@ -95,7 +103,89 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 {profile.kreds || 0} <span className="text-sm font-normal">Kreds</span>
               </div>
               {isMe && <Button variant="outline" className="w-full" onClick={() => window.location.href = '/setup'}>Edit Profile</Button>}
-              {isMe && <Button className="w-full gap-2"><Share2 className="h-4 w-4" /> Share Report Card</Button>}
+              {isMe && (
+                <Dialog>
+                  <DialogTrigger className={buttonVariants({ variant: "default", className: "w-full gap-2" })}>
+                    <Share2 className="h-4 w-4" /> Share Report Card
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[400px] bg-transparent border-0 shadow-none">
+                    <div className="relative w-full aspect-[63/88] rounded-2xl overflow-hidden bg-gradient-to-br from-yellow-300 via-yellow-500 to-yellow-600 p-[10px] shadow-2xl shadow-yellow-500/50 rotate-0 hover:scale-105 transition-transform duration-300">
+                      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30 mix-blend-overlay pointer-events-none"></div>
+                      <div className="bg-slate-50 w-full h-full rounded-xl flex flex-col p-4 relative z-10 border-[6px] border-yellow-200">
+                        
+                        {/* Card Header */}
+                        <div className="flex justify-between items-center mb-3">
+                          <h2 className="font-black text-xl text-slate-800 tracking-tighter uppercase">{profile.full_name}</h2>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs font-bold text-red-600">KREDS</span>
+                            <span className="text-xl font-black text-slate-800">{profile.kreds || 0}</span>
+                          </div>
+                        </div>
+
+                        {/* Image Window */}
+                        <div className="w-full aspect-[4/3] bg-gradient-to-tr from-slate-200 to-slate-100 border-[3px] border-slate-300 rounded shadow-inner mb-3 overflow-hidden relative group">
+                          {profile.avatar_url ? (
+                            <img src={profile.avatar_url} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">👤</div>
+                          )}
+                          <div className="absolute bottom-1 right-1 bg-slate-800/80 text-white text-[10px] px-2 py-0.5 rounded backdrop-blur">
+                            Lv. {Math.floor((profile.kreds || 0) / 100) + 1}
+                          </div>
+                        </div>
+
+                        {/* Card Stats */}
+                        <div className="bg-gradient-to-r from-yellow-100 to-transparent p-1 -mx-2 px-3 text-[10px] italic text-slate-600 mb-4 border-y border-yellow-200/50">
+                          {profile.college || "No College Assigned"} • {profile.batch || "No Batch"}
+                        </div>
+
+                        {/* Abilities / Data */}
+                        <div className="flex-1 space-y-4">
+                          <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="h-4 w-4 rounded-full bg-blue-500 inline-block shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.3)]"></span>
+                              <span className="font-bold text-sm text-slate-800">Missions Completed</span>
+                            </div>
+                            <span className="font-black text-slate-800 text-lg">0</span>
+                          </div>
+                          
+                          <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="h-4 w-4 rounded-full bg-red-500 inline-block shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.3)]"></span>
+                              <span className="font-bold text-sm text-slate-800">Avg. Score</span>
+                            </div>
+                            <span className="font-black text-slate-800 text-lg">N/A</span>
+                          </div>
+
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <span className="h-4 w-4 rounded-full bg-green-500 inline-block shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.3)]"></span>
+                              <span className="font-bold text-sm text-slate-800">Ideas Pitched</span>
+                            </div>
+                            <span className="font-black text-slate-800 text-lg">0</span>
+                          </div>
+                        </div>
+
+                        {/* Footer/Weakness */}
+                        <div className="mt-auto pt-4 flex gap-4 text-[10px] font-medium text-slate-500">
+                          <div className="flex-1">
+                            <span className="block text-slate-400">weakness</span>
+                            <span className="text-slate-700">Missed Deadlines ×2</span>
+                          </div>
+                          <div className="flex-1">
+                            <span className="block text-slate-400">resistance</span>
+                            <span className="text-slate-700">Procrastination -20</span>
+                          </div>
+                          <div className="flex-1 text-right">
+                            <span className="block text-slate-400">social</span>
+                            <span className="text-slate-700 truncate w-full block">{profile.instagram_handle || "@kreon"}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
           </div>
         </CardContent>
@@ -228,9 +318,40 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 <div className="space-y-4">
                   {isMe && (
                     <div className="space-y-2">
-                      <Textarea placeholder="Share your thoughts or suggest a mission idea..." className="resize-none border-primary/20 focus-visible:ring-primary/30" />
-                      <div className="flex justify-end">
-                        <Button size="sm" className="gap-2" onClick={() => toast.success("Idea submitted successfully!")}><Send className="h-3 w-3" /> Submit Idea</Button>
+                      <Textarea value={ideaText} onChange={(e) => setIdeaText(e.target.value)} placeholder="Share your thoughts or suggest a mission idea..." className="resize-none border-primary/20 focus-visible:ring-primary/30" />
+                      <div className="flex justify-between items-center">
+                        <Dialog>
+                          <DialogTrigger className={buttonVariants({ variant: "outline", size: "sm" })}>
+                            View My Ideas
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>My Submitted Ideas</DialogTitle>
+                              <DialogDescription>Track the status of your pitches.</DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                              <div className="border p-3 rounded-lg text-sm">
+                                <div className="flex justify-between items-start mb-2">
+                                  <div className="font-medium">Campus Treasure Hunt</div>
+                                  <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600">Pending</Badge>
+                                </div>
+                                <p className="text-muted-foreground">A campus-wide QR code treasure hunt that leads to a Kreo merchandise popup stall.</p>
+                              </div>
+                              <div className="border p-3 rounded-lg text-sm">
+                                <div className="flex justify-between items-start mb-2">
+                                  <div className="font-medium">Gaming Marathon</div>
+                                  <Badge className="bg-red-500/10 text-red-500 hover:bg-red-500/20">Declined</Badge>
+                                </div>
+                                <p className="text-muted-foreground mb-2">Host a 24-hour gaming stream on college Wi-Fi.</p>
+                                <div className="bg-muted p-2 rounded text-xs border-l-2 border-red-500">
+                                  <span className="font-semibold block mb-1">Management Note:</span>
+                                  College authorities usually don't permit 24hr streams on their network. Can we shorten it to a 4hr evening event?
+                                </div>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                        <Button size="sm" className="gap-2" onClick={handleIdeaSubmit} disabled={!ideaText.trim()}><Send className="h-3 w-3" /> Submit Idea</Button>
                       </div>
                     </div>
                   )}
