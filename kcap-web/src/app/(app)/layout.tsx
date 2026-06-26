@@ -23,10 +23,12 @@ export default async function AppLayout({
   let initial = "U";
 
   if (user) {
-    const { data: profile } = await supabase.from('users').select('role, college, kreds, full_name').eq('id', user.id).single();
+    const { data: profile } = await supabase.from('users').select('role, college, kreds, full_name, username').eq('id', user.id).single();
     
-    // Only force Kreons to complete setup (management can skip college requirement)
+    // Force Kreons to setup if no college. Force Management to setup if no username.
     if (profile?.role === 'kreon' && !profile?.college) {
+      redirect('/setup');
+    } else if ((profile?.role === 'management' || profile?.role === 'admin') && !profile?.username) {
       redirect('/setup');
     }
     

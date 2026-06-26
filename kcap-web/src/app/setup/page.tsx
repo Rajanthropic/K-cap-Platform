@@ -21,6 +21,8 @@ export default function SetupPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   
+  const [userRole, setUserRole] = useState("kreon")
+  
   const [formData, setFormData] = useState({
     full_name: "",
     username: "",
@@ -53,6 +55,7 @@ export default function SetupPage() {
       
       const { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single()
       if (profile) {
+        setUserRole(profile.role || "kreon");
         setFormData(prev => ({
           ...prev,
           full_name: profile.full_name || "",
@@ -218,8 +221,8 @@ export default function SetupPage() {
                 <Input id="phone" type="tel" placeholder="+91 98765 43210" value={formData.phone} onChange={handleChange} />
               </div>
               <div className="space-y-2">
-                <Label>College Name <span className="text-red-500">*</span></Label>
-                <Input id="college" type="text" placeholder="Full college name" value={formData.college} onChange={handleChange} required />
+                <Label>College Name {userRole === "kreon" && <span className="text-red-500">*</span>}</Label>
+                <Input id="college" type="text" placeholder={userRole === "kreon" ? "Full college name" : "College (Optional for Management)"} value={formData.college} onChange={handleChange} required={userRole === "kreon"} />
               </div>
               <div className="space-y-2">
                 <Label>Batch Number</Label>
