@@ -33,9 +33,11 @@ export default function SetupPage() {
     twitter_handle: "",
     youtube_channel: "",
     github_url: "", // using twitter_handle or adding a column if needed
+    avatar_url: "",
   })
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
 
   useEffect(() => {
     async function checkUser() {
@@ -60,7 +62,11 @@ export default function SetupPage() {
           linkedin_url: profile.linkedin_url || "",
           twitter_handle: profile.twitter_handle || "",
           youtube_channel: profile.youtube_channel || "",
+          avatar_url: profile.avatar_url || "",
         }))
+        if (profile.avatar_url) {
+          setAvatarPreview(profile.avatar_url);
+        }
       }
       setFetching(false)
     }
@@ -81,13 +87,31 @@ export default function SetupPage() {
       }
       const imageUrl = URL.createObjectURL(file);
       setAvatarPreview(imageUrl);
-      // Here you would typically also upload it to Supabase Storage and get the public URL to save to the user's profile
+      setAvatarFile(file);
     }
   }
 
   const handleSubmit = async () => {
     if (!userId) return
     setLoading(true)
+
+    let finalAvatarUrl = formData.avatar_url || null;
+
+    if (avatarFile) {
+      const fileExt = avatarFile.name.split('.').pop();
+      const fileName = `${userId}-${Math.random()}.${fileExt}`;
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, avatarFile);
+        
+      if (uploadError) {
+        toast.error("Failed to upload avatar: " + uploadError.message);
+      } else {
+        const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+        finalAvatarUrl = publicUrlData.publicUrl;
+      }
+    }
 
     const hobbiesArray = formData.hobbies.split(',').map(h => h.trim()).filter(Boolean)
 
@@ -105,6 +129,7 @@ export default function SetupPage() {
         linkedin_url: formData.linkedin_url,
         twitter_handle: formData.twitter_handle,
         youtube_channel: formData.youtube_channel,
+        avatar_url: finalAvatarUrl,
         kreds: 50 // Give 50 kreds for completing setup
       })
       .eq('id', userId)
