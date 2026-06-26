@@ -90,7 +90,7 @@ export default async function LeaderboardPage() {
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={leader.avatar_url || ""} />
-                        <AvatarFallback>{leader.name.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>{leader.name ? leader.name.charAt(0) : "U"}</AvatarFallback>
                       </Avatar>
                       <div>
                         <div className="flex items-center gap-2">

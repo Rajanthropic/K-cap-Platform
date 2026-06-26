@@ -29,7 +29,7 @@ export default async function DashboardPage() {
     return (
       <div className="max-w-[95%] 2xl:max-w-[1600px] mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Welcome, {profile?.full_name}!</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Welcome, {profile?.full_name || 'Kreon'}!</h1>
           <p className="text-muted-foreground">Here is your quick overview of the Kreon platform.</p>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
