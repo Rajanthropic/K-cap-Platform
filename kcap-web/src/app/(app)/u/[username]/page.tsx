@@ -128,9 +128,9 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Image Window */}
-                        <div className="w-full aspect-[4/3] bg-gradient-to-tr from-slate-200 to-slate-100 border-[3px] border-slate-300 rounded shadow-inner mb-3 overflow-hidden relative group">
+                        <div className="w-full aspect-[4/3] bg-gradient-to-tr from-slate-200 to-slate-100 border-[3px] border-slate-300 rounded shadow-inner mb-3 overflow-hidden relative group flex items-center justify-center">
                           {profile.avatar_url ? (
-                            <img src={profile.avatar_url} className="w-full h-full object-cover" />
+                            <img src={profile.avatar_url} className="w-full h-full object-contain" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-6xl opacity-20">👤</div>
                           )}

@@ -83,7 +83,7 @@ export default function CommunityFeed({ currentUser }: { currentUser: any }) {
         <CardContent className="p-4">
           <div className="flex gap-4">
             <div className="h-10 w-10 rounded-full bg-accent flex items-center justify-center font-bold text-muted-foreground shrink-0">
-              {currentUser?.full_name?.charAt(0) || 'U'}
+              {currentUser?.full_name ? currentUser.full_name.charAt(0).toUpperCase() : 'U'}
             </div>
             <div className="flex-1 space-y-3">
               <textarea 
@@ -108,7 +108,7 @@ export default function CommunityFeed({ currentUser }: { currentUser: any }) {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3 mb-3">
                   <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold ${post.author?.role === 'management' || post.author?.role === 'admin' ? 'bg-orange-500/20 text-orange-600' : 'bg-primary/20 text-primary'}`}>
-                    {post.author?.full_name?.charAt(0).toUpperCase() || 'U'}
+                    {post.author?.full_name ? post.author.full_name.charAt(0).toUpperCase() : 'U'}
                   </div>
                   <div>
                     <div className="font-semibold text-sm">
