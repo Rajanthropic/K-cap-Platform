@@ -20,7 +20,7 @@ import { useParams } from "next/navigation";
 
 export default function ProfilePage() {
   const params = useParams();
-  const usernameParam = params.username as string;
+  const usernameParam = params?.username as string;
   const [ideaMode, setIdeaMode] = useState<"idea" | "event">("idea");
   
   const [profile, setProfile] = useState<any>(null);

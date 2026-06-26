@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import Link from "next/link"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -70,10 +70,8 @@ export default function LoginPage() {
               </span>
             </div>
           </div>
-          <Link href="/register" className="w-full">
-            <Button variant="secondary" className="w-full border shadow-sm">
-              Sign Up
-            </Button>
+          <Link href="/register" className={buttonVariants({ variant: "secondary", className: "w-full border shadow-sm" })}>
+            Sign Up
           </Link>
         </CardFooter>
       </Card>

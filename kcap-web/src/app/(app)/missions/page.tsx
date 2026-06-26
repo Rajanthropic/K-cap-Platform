@@ -98,8 +98,8 @@ export default async function MissionsPage() {
                   </DialogContent>
                 </Dialog>
               ) : (
-                <Link href={`/missions/${mission.id}`} className="flex-1">
-                  <Button className="w-full">View & Enroll</Button>
+                <Link href={`/missions/${mission.id}`} className={buttonVariants({ variant: "default", className: "flex-1 w-full" })}>
+                  View & Enroll
                 </Link>
               )}
               {mission.id !== 'tutorial' && <Button variant="outline" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 border-red-200 dark:border-red-900">Decline</Button>}
