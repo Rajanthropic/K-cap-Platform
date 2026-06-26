@@ -17,6 +17,7 @@ type Comment = {
     id: string;
     full_name: string;
     role: string;
+    avatar_url: string | null;
   };
 };
 
@@ -30,6 +31,7 @@ type Post = {
     id: string;
     full_name: string;
     role: string;
+    avatar_url: string | null;
   };
   community_comments: Comment[];
 };
@@ -53,10 +55,10 @@ export default function CommunityFeed({ currentUser }: { currentUser: any }) {
       .from("community_posts")
       .select(`
         id, content, media_url, likes, created_at,
-        author:author_id ( id, full_name, role ),
+        author:author_id ( id, full_name, role, avatar_url ),
         community_comments (
           id, content, created_at,
-          author:author_id ( id, full_name, role )
+          author:author_id ( id, full_name, role, avatar_url )
         )
       `)
       .order("created_at", { ascending: false })
@@ -226,7 +228,11 @@ export default function CommunityFeed({ currentUser }: { currentUser: any }) {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3 mb-3">
                   <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold overflow-hidden ${post.author?.role === 'management' || post.author?.role === 'admin' ? 'bg-orange-500/20 text-orange-600' : 'bg-primary/20 text-primary'}`}>
-                    {post.author?.full_name ? post.author.full_name.charAt(0).toUpperCase() : 'U'}
+                    {post.author?.avatar_url ? (
+                      <img src={post.author.avatar_url} className="w-full h-full object-cover" />
+                    ) : (
+                      post.author?.full_name ? post.author.full_name.charAt(0).toUpperCase() : 'U'
+                    )}
                   </div>
                   <div>
                     <div className="font-semibold text-sm">
@@ -265,8 +271,12 @@ export default function CommunityFeed({ currentUser }: { currentUser: any }) {
                     <div className="space-y-3 mb-3 max-h-60 overflow-y-auto pr-2">
                       {post.community_comments.map(comment => (
                         <div key={comment.id} className="flex gap-2">
-                          <div className="h-6 w-6 rounded-full bg-accent flex items-center justify-center font-bold text-[10px] shrink-0">
-                            {comment.author?.full_name ? comment.author.full_name.charAt(0).toUpperCase() : 'U'}
+                          <div className="h-6 w-6 rounded-full bg-accent flex items-center justify-center font-bold text-[10px] shrink-0 overflow-hidden">
+                            {comment.author?.avatar_url ? (
+                              <img src={comment.author.avatar_url} className="w-full h-full object-cover" />
+                            ) : (
+                              comment.author?.full_name ? comment.author.full_name.charAt(0).toUpperCase() : 'U'
+                            )}
                           </div>
                           <div className="flex-1 bg-background border border-border/50 p-2 rounded-lg text-sm">
                             <div className="flex items-center justify-between mb-1">
