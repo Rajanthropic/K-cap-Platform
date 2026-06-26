@@ -23,6 +23,9 @@ import { useState } from "react";
 export default function TimelinePage() {
   const events: any[] = [];
   const [isOpen, setIsOpen] = useState(false);
+  const [filter, setFilter] = useState("All");
+
+  const filteredEvents = filter === "All" ? events : events.filter(e => e.type.toLowerCase().includes(filter.toLowerCase()));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,14 +100,14 @@ export default function TimelinePage() {
       </div>
 
       <div className="flex gap-2 pb-2">
-        <Badge variant="default" className="cursor-pointer">All</Badge>
-        <Badge variant="outline" className="cursor-pointer hover:bg-muted">Watch Parties</Badge>
-        <Badge variant="outline" className="cursor-pointer hover:bg-muted">Gaming</Badge>
-        <Badge variant="outline" className="cursor-pointer hover:bg-muted">Learning</Badge>
+        <Badge variant={filter === "All" ? "default" : "outline"} className="cursor-pointer hover:bg-muted/80" onClick={() => setFilter("All")}>All</Badge>
+        <Badge variant={filter === "Watch Parties" ? "default" : "outline"} className="cursor-pointer hover:bg-muted/80" onClick={() => setFilter("Watch Parties")}>Watch Parties</Badge>
+        <Badge variant={filter === "Gaming" ? "default" : "outline"} className="cursor-pointer hover:bg-muted/80" onClick={() => setFilter("Gaming")}>Gaming</Badge>
+        <Badge variant={filter === "Learning" ? "default" : "outline"} className="cursor-pointer hover:bg-muted/80" onClick={() => setFilter("Learning")}>Learning</Badge>
       </div>
 
       <div className="space-y-6">
-        {events.length > 0 ? events.map(event => (
+        {filteredEvents.length > 0 ? filteredEvents.map(event => (
           <Card key={event.id}>
             <CardHeader>
               <div className="flex justify-between items-start">

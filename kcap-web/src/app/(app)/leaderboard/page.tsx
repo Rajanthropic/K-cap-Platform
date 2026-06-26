@@ -10,11 +10,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { createClient } from "@/lib/supabase/server";
 
-export default function LeaderboardPage() {
-  const leaders: any[] = [
-    // Data will be fetched from database here
-  ];
+export default async function LeaderboardPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data: usersList } = await supabase
+    .from('users')
+    .select('id, full_name, username, college, batch, kreds, avatar_url')
+    .eq('role', 'kreon')
+    .order('kreds', { ascending: false })
+    .limit(50);
+
+  const leaders = (usersList || []).map((u, index) => ({
+    rank: index + 1,
+    id: u.id,
+    name: u.full_name,
+    username: u.username,
+    college: u.college,
+    batch: u.batch,
+    credits: u.kreds || 0,
+    avatar_url: u.avatar_url,
+    overachiever: (u.kreds || 0) > 500,
+    isMe: user?.id === u.id
+  }));
+
+  const myRank = leaders.find(l => l.isMe);
 
   return (
     <div className="max-w-[95%] 2xl:max-w-[1600px] mx-auto space-y-6">
@@ -33,14 +55,16 @@ export default function LeaderboardPage() {
         <CardHeader className="bg-primary/5 border-b pb-4">
           <CardTitle className="flex justify-between items-center text-lg font-medium">
             <span>Your Ranking</span>
-            <span className="text-sm font-normal text-muted-foreground">Complete missions to climb the leaderboard!</span>
+            <span className="text-sm font-normal text-muted-foreground">
+              {myRank ? `You are rank #${myRank.rank}!` : "Complete missions to climb the leaderboard!"}
+            </span>
           </CardTitle>
           <div className="flex items-center gap-4 pt-4">
-            <div className="text-3xl font-bold text-primary">-</div>
+            <div className="text-3xl font-bold text-primary">{myRank ? `#${myRank.rank}` : "-"}</div>
             <div className="flex-1 bg-muted h-2 rounded-full overflow-hidden">
-              <div className="bg-primary h-full w-[0%]" />
+              <div className="bg-primary h-full" style={{ width: myRank ? `${Math.min((myRank.credits / 1000) * 100, 100)}%` : '0%' }} />
             </div>
-            <div className="text-sm font-medium">0 Kreds</div>
+            <div className="text-sm font-medium">{myRank ? myRank.credits : 0} Kreds</div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -65,6 +89,7 @@ export default function LeaderboardPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
+                        <AvatarImage src={leader.avatar_url || ""} />
                         <AvatarFallback>{leader.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div>

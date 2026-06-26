@@ -61,10 +61,12 @@ export default function ProfilePage() {
   }, [usernameParam, supabase]);
 
   const [ideaText, setIdeaText] = useState("");
+  const [submittedIdeas, setSubmittedIdeas] = useState<any[]>([]);
   
   const handleIdeaSubmit = () => {
     if (!ideaText.trim()) return;
-    toast.success("Idea submitted successfully!");
+    toast.success("Idea submitted successfully! It has been sent to management.");
+    setSubmittedIdeas([{ title: "Your New Pitch", desc: ideaText, status: "Pending" }, ...submittedIdeas]);
     setIdeaText("");
   };
 
@@ -333,24 +335,17 @@ export default function ProfilePage() {
                               <DialogDescription>Track the status of your pitches.</DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 py-4">
-                              <div className="border p-3 rounded-lg text-sm">
-                                <div className="flex justify-between items-start mb-2">
-                                  <div className="font-medium">Campus Treasure Hunt</div>
-                                  <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600">Pending</Badge>
+                              {submittedIdeas.length > 0 ? submittedIdeas.map((idea, idx) => (
+                                <div key={idx} className="border p-3 rounded-lg text-sm">
+                                  <div className="flex justify-between items-start mb-2">
+                                    <div className="font-medium">{idea.title}</div>
+                                    <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600">{idea.status}</Badge>
+                                  </div>
+                                  <p className="text-muted-foreground">{idea.desc}</p>
                                 </div>
-                                <p className="text-muted-foreground">A campus-wide QR code treasure hunt that leads to a Kreo merchandise popup stall.</p>
-                              </div>
-                              <div className="border p-3 rounded-lg text-sm">
-                                <div className="flex justify-between items-start mb-2">
-                                  <div className="font-medium">Gaming Marathon</div>
-                                  <Badge className="bg-red-500/10 text-red-500 hover:bg-red-500/20">Declined</Badge>
-                                </div>
-                                <p className="text-muted-foreground mb-2">Host a 24-hour gaming stream on college Wi-Fi.</p>
-                                <div className="bg-muted p-2 rounded text-xs border-l-2 border-red-500">
-                                  <span className="font-semibold block mb-1">Management Note:</span>
-                                  College authorities usually don't permit 24hr streams on their network. Can we shorten it to a 4hr evening event?
-                                </div>
-                              </div>
+                              )) : (
+                                <div className="text-center text-muted-foreground py-8">You haven't submitted any ideas yet.</div>
+                              )}
                             </div>
                           </DialogContent>
                         </Dialog>

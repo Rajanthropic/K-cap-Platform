@@ -80,53 +80,9 @@ export default async function DashboardPage() {
           </Card>
 
           <div className="space-y-4 pt-4">
-            {/* Mock Post 1 */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="h-10 w-10 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold">AJ</div>
-                    <div>
-                      <div className="font-semibold text-sm">Alice Johnson</div>
-                      <div className="text-xs text-muted-foreground">2 hours ago</div>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-sm">Just finished building my custom keyboard and hit Immortal in Valorant! 🎯 Let me know if anyone wants to duo queue later tonight.</p>
-                <div className="flex items-center gap-4 mt-4 pt-3 border-t">
-                  <button className="text-muted-foreground hover:text-primary text-xs font-medium flex items-center gap-1">
-                    ❤️ Like (12)
-                  </button>
-                  <button className="text-muted-foreground hover:text-primary text-xs font-medium flex items-center gap-1">
-                    💬 Comment (3)
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Mock Post 2 */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="h-10 w-10 rounded-full bg-orange-500/20 text-orange-600 flex items-center justify-center font-bold">RS</div>
-                    <div>
-                      <div className="font-semibold text-sm">Rahul Sharma <Badge variant="secondary" className="ml-2 text-[10px] h-4">Admin</Badge></div>
-                      <div className="text-xs text-muted-foreground">5 hours ago</div>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-sm">Welcome to all the new Kreons joining the platform today! Make sure you complete the platform tutorial mission to learn the ropes. Big things coming soon. 🚀</p>
-                <div className="flex items-center gap-4 mt-4 pt-3 border-t">
-                  <button className="text-muted-foreground hover:text-primary text-xs font-medium flex items-center gap-1">
-                    ❤️ Like (45)
-                  </button>
-                  <button className="text-muted-foreground hover:text-primary text-xs font-medium flex items-center gap-1">
-                    💬 Comment (8)
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="text-center text-muted-foreground py-12 border rounded-xl border-dashed">
+              No posts yet. Be the first to share an update!
+            </div>
           </div>
         </div>
 

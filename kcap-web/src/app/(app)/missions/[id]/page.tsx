@@ -6,10 +6,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { CalendarDays, Users, CheckCircle2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import TutorialMissionClient from "./TutorialMissionClient";
 
 export default async function MissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   // In a real app, fetch mission details by ID
   const resolvedParams = await params;
+  
+  if (resolvedParams.id === 'tutorial') {
+    return <TutorialMissionClient />;
+  }
+  
   const isEnrolled = resolvedParams.id === 'm1'; // Mock state for demo
 
   return (
