@@ -72,7 +72,7 @@ export default async function DashboardPage() {
                     rows={2}
                   />
                   <div className="flex justify-end">
-                    <Button size="sm" onClick={() => { alert("Posting to community feed is coming soon!"); }}>Post Update</Button>
+                    <Button size="sm" disabled>Post Update</Button>
                   </div>
                 </div>
               </div>
