@@ -10,6 +10,7 @@ import { useState, useEffect, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { ImageCropperModal } from "@/components/ImageCropper"
 
 export default function SetupPage() {
   const supabase = createClient()
@@ -38,6 +39,8 @@ export default function SetupPage() {
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [cropModalOpen, setCropModalOpen] = useState(false)
+  const [tempImageSrc, setTempImageSrc] = useState<string | null>(null)
 
   useEffect(() => {
     async function checkUser() {
@@ -86,9 +89,19 @@ export default function SetupPage() {
         return;
       }
       const imageUrl = URL.createObjectURL(file);
-      setAvatarPreview(imageUrl);
-      setAvatarFile(file);
+      setTempImageSrc(imageUrl);
+      setCropModalOpen(true);
+      // Reset input value so the same file can be selected again if needed
+      e.target.value = '';
     }
+  }
+
+  const handleCropComplete = (croppedBlob: Blob, croppedUrl: string) => {
+    setAvatarPreview(croppedUrl);
+    // Convert Blob to File
+    const croppedFile = new File([croppedBlob], "avatar.jpg", { type: "image/jpeg" });
+    setAvatarFile(croppedFile);
+    setCropModalOpen(false);
   }
 
   const handleSubmit = async () => {
@@ -259,6 +272,15 @@ export default function SetupPage() {
           </Button>
         </CardFooter>
       </Card>
+
+      {tempImageSrc && (
+        <ImageCropperModal
+          open={cropModalOpen}
+          imageSrc={tempImageSrc}
+          onClose={() => setCropModalOpen(false)}
+          onCropCompleteAction={handleCropComplete}
+        />
+      )}
     </div>
   )
 }
