@@ -4,15 +4,10 @@
 
 ▲ Next.js 16.2.7 (Turbopack)
 - Local:         http://localhost:3000
-- Network:       http://172.17.0.81:3000
+- Network:       http://192.168.1.4:3000
 - Environments: .env.local, .env
-✓ Ready in 1479ms
+✓ Ready in 881ms
 
- GET / 307 in 769ms (next.js: 426ms, application-code: 343ms)
- GET /dashboard 307 in 1093ms (next.js: 205ms, application-code: 888ms)
- GET /login 200 in 294ms (next.js: 87ms, application-code: 207ms)
-✓ Compiled in 1741ms
-✓ Compiled in 291ms
-✓ Compiled in 281ms
-✓ Compiled in 79ms
-✓ Compiled in 67ms
+ GET / 307 in 367ms (next.js: 203ms, application-code: 164ms)
+ GET /dashboard 307 in 167ms (next.js: 84ms, application-code: 83ms)
+ GET /login 200 in 134ms (next.js: 45ms, application-code: 89ms)

@@ -18,7 +18,10 @@ import { createClient } from "@/lib/supabase/server";
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const { data: profile } = await supabase.from('users').select('*').eq('id', user?.id).single();
+  
+  if (!user) return null; // Let layout handle the redirect
+
+  const { data: profile } = await supabase.from('users').select('*').eq('id', user.id).single();
   
   const isManagement = profile?.role === 'admin' || profile?.role === 'management';
 

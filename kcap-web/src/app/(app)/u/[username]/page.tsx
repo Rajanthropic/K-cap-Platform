@@ -16,8 +16,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 
-export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
-  const resolvedParams = use(params);
+import { useParams } from "next/navigation";
+
+export default function ProfilePage() {
+  const params = useParams();
+  const usernameParam = params.username as string;
   const [ideaMode, setIdeaMode] = useState<"idea" | "event">("idea");
   
   const [profile, setProfile] = useState<any>(null);
@@ -38,7 +41,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     async function fetchProfile() {
       const { data: { user } } = await supabase.auth.getUser();
       
-      let queryUsername = resolvedParams.username;
+      let queryUsername = usernameParam;
       
       if (queryUsername === 'me') {
         if (!user) return;
@@ -54,8 +57,8 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
       }
       setLoading(false);
     }
-    fetchProfile();
-  }, [resolvedParams.username, supabase]);
+    if (usernameParam) fetchProfile();
+  }, [usernameParam, supabase]);
 
   const [ideaText, setIdeaText] = useState("");
   
